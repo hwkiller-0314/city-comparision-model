@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>城市综合实力比较模型 | 270 项公开指标，两座城市，一把尺子</title>
+<meta name="description" content="一个可复现的 MATLAB 城市对比模型：270 项公开指标、12 大类、软硬实力加权，输出分类图、胜负统计与相对强度指数。">
+<meta name="theme-color" content="#07121f">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="canonical" href="https://hwkiller-0314.github.io/city-comparison-model/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="城市综合实力比较模型 v2">
+<meta property="og:description" content="把“谁更强”从口水战，变成一份可复现报告。">
+<meta property="og:image" content="https://hwkiller-0314.github.io/city-comparison-model/images/social-preview.png">
+<meta property="og:url" content="https://hwkiller-0314.github.io/city-comparison-model/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{
+  --ink:#07121f;
+  --deep:#0b1b2b;
+  --panel:#10263a;
+  --panel-2:#142d43;
+  --line:#29506b;
+  --text:#f2f7fd;
+  --muted:#a9bbce;
+  --cyan:#69d7d0;
+  --blue:#65aff8;
+  --amber:#e2ad5e;
+  --mint:#80d7a9;
+  --danger:#ef8a76;
+  --shadow:0 20px 60px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--text);font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;line-height:1.7}
+a{color:inherit;text-decoration:none}
+button,select{font:inherit}
+.wrap{width:min(1160px,calc(100% - 40px));margin:0 auto}
+.hero{position:relative;min-height:720px;display:flex;align-items:center;isolation:isolate;background:var(--ink) url("images/example-category.png") center right 14% / auto 92% no-repeat;border-bottom:1px solid var(--line)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(7,18,31,.99) 0%,rgba(7,18,31,.96) 43%,rgba(7,18,31,.58) 72%,rgba(7,18,31,.24) 100%)}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:150px;z-index:-1;background:linear-gradient(0deg,var(--ink),transparent)}
+.nav{position:absolute;top:0;left:0;right:0;padding:22px 0;border-bottom:1px solid rgba(105,215,208,.18)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{font-weight:800;font-size:16px;letter-spacing:0}
+.nav-links{display:flex;align-items:center;gap:24px;color:var(--muted);font-size:14px}
+.nav-links a:hover{color:var(--cyan)}
+.hero-inner{padding:120px 0 70px;max-width:760px}
+.eyebrow{color:var(--cyan);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0}
+.hero h1{font-size:68px;line-height:1.08;letter-spacing:0;margin:14px 0 22px;max-width:720px}
+.hero h1 span{display:block;color:var(--blue)}
+.hero p{font-size:19px;color:#d5e1ef;max-width:680px;margin:0 0 30px}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 18px;border:1px solid var(--line);border-radius:6px;background:rgba(13,35,53,.88);font-weight:800;font-size:15px}
+.btn.primary{background:#176a70;border-color:#2e9b9a}
+.btn.star{background:#6d4e21;border-color:#a77d39}
+.btn:hover{border-color:var(--cyan);color:#fff;transform:translateY(-1px)}
+.hero-stats{display:flex;flex-wrap:wrap;gap:26px;margin-top:38px;padding-top:24px;border-top:1px solid rgba(105,215,208,.22)}
+.stat strong{display:block;font-size:22px;color:#fff}
+.stat span{display:block;color:var(--muted);font-size:13px}
+section{padding:84px 0;border-bottom:1px solid var(--line)}
+.section-head{display:grid;grid-template-columns:1fr minmax(280px,520px);gap:48px;align-items:end;margin-bottom:38px}
+.section-head h2{font-size:36px;line-height:1.2;margin:0;letter-spacing:0}
+.section-head p{margin:0;color:var(--muted)}
+.demo-shell{display:grid;grid-template-columns:340px minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+.demo-control{padding:28px;background:var(--panel);border-right:1px solid var(--line)}
+.demo-control label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
+.demo-control select{width:100%;padding:13px 12px;background:#081a2a;color:#fff;border:1px solid var(--line);border-radius:6px}
+.pair{margin:28px 0 0}
+.pair small{display:block;color:var(--muted)}
+.pair strong{display:block;font-size:24px;line-height:1.35;margin-top:5px}
+.index{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.index strong{display:block;font-size:54px;line-height:1;color:var(--amber)}
+.index span{display:block;color:var(--muted);font-size:13px;margin-top:8px}
+.demo-result{padding:30px;background:var(--deep);min-height:430px}
+.metrics{display:grid;gap:20px}
+.metric{display:grid;grid-template-columns:74px minmax(0,1fr) 92px;align-items:center;gap:14px}
+.metric-label{font-weight:800;font-size:14px}
+.metric-value{text-align:right;font-variant-numeric:tabular-nums;font-weight:800}
+.track{position:relative;height:20px;border-radius:4px;background:#142d43;overflow:hidden;border:1px solid #1f425b}
+.track::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(255,255,255,.38)}
+.bar{position:absolute;top:3px;bottom:3px;border-radius:3px}
+.bar.positive{left:50%;background:linear-gradient(90deg,#2a87da,#75bbff)}
+.bar.negative{right:50%;background:linear-gradient(90deg,#d87161,#ef9a81)}
+.result-note{margin-top:28px;padding:18px;border-left:4px solid var(--amber);background:#102337;color:#dce8f4}
+.result-note strong{color:#fff}
+.legend{display:flex;gap:20px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-top:22px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:middle}
+.legend .pos::before{background:#58a9fa}.legend .neg::before{background:#e18572}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.item{padding:22px 0 10px;border-top:3px solid var(--blue);background:transparent}
+.item:nth-child(2n){border-top-color:var(--cyan)}
+.item:nth-child(3n){border-top-color:var(--amber)}
+.item h3{font-size:18px;margin:0 0 8px}
+.item p{margin:0;color:var(--muted);font-size:14px}
+.section-alt{background:var(--deep)}
+.method{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.step{padding:22px;background:#0c1f31;border:1px solid var(--line);border-radius:8px}
+.step b{display:block;color:var(--cyan);font-size:13px}
+.step h3{font-size:18px;margin:8px 0}
+.step p{margin:0;color:var(--muted);font-size:14px}
+.limits{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start}
+.limits h2{margin-top:0}
+.limits p{color:var(--muted)}
+.warning{padding:22px;border:1px solid #70593b;border-radius:8px;background:#241e15}
+.warning strong{color:var(--amber)}
+.cta{padding:64px 0;background:#102b3d;border-top:1px solid #2f617b;border-bottom:0}
+.cta-inner{display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center}
+.cta h2{font-size:32px;margin:0 0 8px}
+.cta p{margin:0;color:#c3d4e4}
+footer{padding:30px 0 44px;color:var(--muted);font-size:13px;background:var(--ink)}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+[hidden]{display:none !important}
+@media(max-width:920px){
+  .hero{min-height:650px;background-size:cover;background-position:center}
+  .hero::before{background:linear-gradient(90deg,rgba(7,18,31,.99),rgba(7,18,31,.78))}
+  .hero h1{font-size:50px}
+  .section-head,.demo-shell,.limits,.cta-inner{grid-template-columns:1fr}
+  .demo-control{border-right:0;border-bottom:1px solid var(--line)}
+  .grid-4,.method{grid-template-columns:repeat(2,1fr)}
+  .nav-links a:not(.star-link){display:none}
+}
+@media(max-width:620px){
+  .wrap{width:min(100% - 28px,1160px)}
+  .hero{min-height:700px;background-position:68% center}
+  .hero-inner{padding-top:112px}
+  .hero h1{font-size:38px}
+  .hero p{font-size:17px}
+  .hero-stats{gap:16px}
+  .stat{min-width:44%}
+  .section-head h2{font-size:30px}
+  section{padding:64px 0}
+  .grid-4,.grid-3,.method{grid-template-columns:1fr}
+  .demo-result{padding:22px 16px}
+  .metric{grid-template-columns:64px minmax(0,1fr) 76px;gap:9px}
+  .btn{width:100%}
+  .actions{display:grid}
+}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "城市综合实力比较模型 v2",
+  "description": "基于270项公开指标和软硬实力加权的双城对比模型，输出可复现的CSV、TXT和PNG结果。",
+  "codeRepository": "https://github.com/hwkiller-0314/city-comparison-model",
+  "programmingLanguage": "MATLAB",
+  "license": "https://opensource.org/licenses/MIT",
+  "author": {"@type": "Person", "name": "hwkiller-0314"}
+}
+</script>
+</head>
+<body>
+<header class="hero">
+  <nav class="nav" aria-label="主导航">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#">城市综合实力比较模型 v2</a>
+      <div class="nav-links">
+        <a href="#demo">在线演示</a>
+        <a href="#方法">计算方法</a>
+        <a href="https://github.com/hwkiller-0314/city-comparison-model">GitHub</a>
+        <a class="star-link" href="https://github.com/hwkiller-0314/city-comparison-model/stargazers">Star</a>
+      </div>
+    </div>
+  </nav>
+  <div class="wrap hero-inner">
+    <div class="eyebrow">270 public indicators / 12 categories / MIT</div>
+    <h1>两座城市，<span>一把公开的尺子。</span></h1>
+    <p>把“谁更强”从口水战，变成一份可复现报告。输入两份表格，得到硬实力、软实力、分类胜负与相对强度指数。</p>
+    <div class="actions">
+      <a class="btn primary" href="#demo">先看在线演示</a>
+      <a class="btn" href="https://github.com/hwkiller-0314/city-comparison-model">查看 MATLAB 源码</a>
+      <a class="btn star" href="https://github.com/hwkiller-0314/city-comparison-model/stargazers">点个 Star</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><strong>270</strong><span>项公开指标</span></div>
+      <div class="stat"><strong>12</strong><span>个大类</span></div>
+      <div class="stat"><strong>16</strong><span>组实测对比</span></div>
+      <div class="stat"><strong>4</strong><span>种可复现产物</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="demo">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>不装 MATLAB，也能先看结果</h2>
+        <p>下面的数据来自仓库公开的实测总览。切换城市组合，可以查看硬实力、软实力、综合优势和相对强度指数。</p>
+      </div>
+      <div class="demo-shell">
+        <div class="demo-control">
+          <label for="comparison-select">选择一组城市对比</label>
+          <select id="comparison-select" aria-label="选择城市对比"></select>
+          <div class="pair">
+            <small>当前对比</small>
+            <strong id="pair-name">正在加载...</strong>
+          </div>
+          <div class="index">
+            <small>前城综合指数</small>
+            <strong id="index-value">--</strong>
+            <span id="index-caption">后城设为 100</span>
+          </div>
+        </div>
+        <div class="demo-result" aria-live="polite">
+          <div class="metrics">
+            <div class="metric">
+              <span class="metric-label">硬实力</span>
+              <div class="track"><span class="bar" id="bar-hard"></span></div>
+              <span class="metric-value" id="value-hard">--</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">软实力</span>
+              <div class="track"><span class="bar" id="bar-soft"></span></div>
+              <span class="metric-value" id="value-soft">--</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">综合</span>
+              <div class="track"><span class="bar" id="bar-total"></span></div>
+              <span class="metric-value" id="value-total">--</span>
+            </div>
+          </div>
+          <div class="result-note" id="result-note">正在载入公开结果...</div>
+          <div class="legend">
+            <span class="pos">正数表示前城占优</span>
+            <span class="neg">负数表示后城占优</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-alt" id="方法">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>不是黑箱，每一步都能复查</h2>
+        <p>模型把指标、权重、数据和规则拆成可编辑文件。你可以直接质疑某个权重，也可以换一套口径重跑。</p>
+      </div>
+      <div class="method">
+        <article class="step"><b>STEP 01</b><h3>统一口径</h3><p>把统计公报、年鉴和榜单字段映射到 270 项规范指标。</p></article>
+        <article class="step"><b>STEP 02</b><h3>降低重复</h3><p>对 GDP、工业、财政等高相关指标施加冗余折扣。</p></article>
+        <article class="step"><b>STEP 03</b><h3>计算差距</h3><p>使用 log2 比值衡量优势，单项结果截断在 ±3。</p></article>
+        <article class="step"><b>STEP 04</b><h3>输出报告</h3><p>汇总 12 个大类、胜负项、综合指数和分类图。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <h2>一次运行，拿到四种产物</h2>
+        <p>结果能直接进入论文、PPT、公众号文章或数据新闻，不需要再手工拼表。</p>
+      </div>
+      <div class="grid-4">
+        <article class="item"><h3>总览 CSV</h3><p>硬实力、软实力、综合优势与相对强度指数。</p></article>
+        <article class="item"><h3>分类 CSV</h3><p>12 个大类的加权优势和胜负项明细。</p></article>
+        <article class="item"><h3>摘要 TXT</h3><p>一段可直接引用的自然语言结论。</p></article>
+        <article class="item"><h3>分类图 PNG</h3><p>适合投稿与汇报的 1920 像素对比图。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-alt">
+    <div class="wrap limits">
+      <div>
+        <h2>边界说清楚，结论才可信</h2>
+        <p>这是一个方向性比较工具，不是权威城市排名。总量指标天然利好规模更大的城市，换成人均口径后结论可能反转。</p>
+        <p>部分类别的样本量有限，不同城市的统计范围也可能不完全一致。当前“软 3 硬 7”的权重来自建模者判断，不是客观真理。</p>
+      </div>
+      <aside class="warning">
+        <strong>使用建议</strong>
+        <p>同时查看总量口径与人均口径，把结果当作讨论的起点，而不是判决书。完整审查见仓库中的模型自审报告与补数据复算报告。</p>
+        <a class="btn" href="https://github.com/hwkiller-0314/city-comparison-model/tree/main/docs">阅读审计报告</a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap cta-inner">
+      <div>
+        <h2>想比较你的城市？</h2>
+        <p>模型、权重、数据模板和全部实测结果都已开源。点单一组城市，或者直接换一套权重重跑。</p>
+      </div>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/hwkiller-0314/city-comparison-model">打开仓库</a>
+        <a class="btn star" href="https://github.com/hwkiller-0314/city-comparison-model/stargazers">Star 支持</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>城市综合实力比较模型 v2 · MATLAB · MIT</span>
+    <span><a href="https://github.com/hwkiller-0314/city-comparison-model">github.com/hwkiller-0314/city-comparison-model</a></span>
+  </div>
+</footer>
+
+<script>
+const fmt = value => `${value >= 0 ? "+" : ""}${value.toFixed(5)}`;
+let comparisons = [];
+
+function setBar(element, value) {
+  const width = Math.min(Math.abs(value) / 1.7 * 50, 50);
+  element.className = `bar ${value >= 0 ? "positive" : "negative"}`;
+  element.style.width = `${width}%`;
+}
+
+function updateComparison(item) {
+  document.getElementById("pair-name").textContent = `${item.a} vs ${item.b}`;
+  document.getElementById("index-value").textContent = item.index.toFixed(2);
+  document.getElementById("value-hard").textContent = fmt(item.hard);
+  document.getElementById("value-soft").textContent = fmt(item.soft);
+  document.getElementById("value-total").textContent = fmt(item.total);
+  setBar(document.getElementById("bar-hard"), item.hard);
+  setBar(document.getElementById("bar-soft"), item.soft);
+  setBar(document.getElementById("bar-total"), item.total);
+
+  let note;
+  if (item.index >= 100) {
+    note = `<strong>${item.a}</strong> 的综合强度约为 <strong>${item.b}</strong> 的 ${item.index.toFixed(2)}%。`;
+  } else {
+    const reverse = 10000 / item.index;
+    note = `<strong>${item.b}</strong> 的综合强度约为 <strong>${item.a}</strong> 的 ${reverse.toFixed(2)}%。`;
+  }
+  const stronger = item.total >= 0 ? item.a : item.b;
+  note += ` 在综合口径下，${stronger}暂时占优。`;
+  document.getElementById("result-note").innerHTML = note;
+  document.getElementById("index-caption").textContent = `${item.b} = 100 时的 ${item.a} 相对强度`;
+}
+
+fetch("data/comparisons.json")
+  .then(response => {
+    if (!response.ok) throw new Error("Unable to load comparison data");
+    return response.json();
+  })
+  .then(data => {
+    comparisons = data;
+    const select = document.getElementById("comparison-select");
+    select.innerHTML = comparisons.map((item, index) => `<option value="${index}">${item.a} vs ${item.b}</option>`).join("");
+    select.addEventListener("change", event => updateComparison(comparisons[Number(event.target.value)]));
+    updateComparison(comparisons[0]);
+  })
+  .catch(() => {
+    document.getElementById("pair-name").textContent = "数据加载失败";
+    document.getElementById("result-note").textContent = "请直接打开仓库查看 v2城市对比总览.csv。";
+  });
+</script>
+</body>
+</html>

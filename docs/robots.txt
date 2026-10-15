@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hwkiller-0314.github.io/city-comparison-model/sitemap.xml

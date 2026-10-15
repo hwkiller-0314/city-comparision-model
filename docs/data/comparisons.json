@@ -1,0 +1,18 @@
+[
+  {"id":"beijing-shanghai","a":"北京","b":"上海","hard":-0.01379,"soft":0.44628,"total":0.12423,"index":108.99},
+  {"id":"beijing-tianjin","a":"北京","b":"天津","hard":0.80226,"soft":1.53685,"total":1.02264,"index":203.16},
+  {"id":"shanghai-shenzhen","a":"上海","b":"深圳","hard":0.34664,"soft":0.61679,"total":0.42768,"index":134.51},
+  {"id":"tianjin-shenyang","a":"天津","b":"沈阳","hard":0.62655,"soft":0.92270,"total":0.71540,"index":164.19},
+  {"id":"shenyang-dalian","a":"沈阳","b":"大连","hard":0.09883,"soft":-0.17045,"total":0.01805,"index":101.26},
+  {"id":"shenyang-harbin","a":"沈阳","b":"哈尔滨","hard":0.34265,"soft":0.36493,"total":0.34933,"index":127.40},
+  {"id":"shenyang-xian","a":"沈阳","b":"西安","hard":-0.40978,"soft":-1.17759,"total":-0.64012,"index":64.17},
+  {"id":"xian-tianjin","a":"西安","b":"天津","hard":-0.21043,"soft":0.02592,"total":-0.13952,"index":90.78},
+  {"id":"hangzhou-suzhou","a":"杭州","b":"苏州","hard":0.01923,"soft":-0.22684,"total":-0.05460,"index":96.29},
+  {"id":"hangzhou-nanjing","a":"杭州","b":"南京","hard":0.18932,"soft":-0.33914,"total":0.03078,"index":102.16},
+  {"id":"hangzhou-chengdu","a":"杭州","b":"成都","hard":-0.06833,"soft":-0.51391,"total":-0.20201,"index":86.93},
+  {"id":"chengdu-guangzhou","a":"成都","b":"广州","hard":-0.09650,"soft":-0.18038,"total":-0.12166,"index":91.91},
+  {"id":"beijing-liaoning","a":"北京","b":"辽宁（省级）","hard":0.37337,"soft":1.61671,"total":0.74637,"index":167.76},
+  {"id":"guangzhou-shenzhen","a":"广州","b":"深圳","hard":-0.18036,"soft":-0.28175,"total":-0.21078,"index":86.41},
+  {"id":"guangzhou-hangzhou","a":"广州","b":"杭州","hard":0.10399,"soft":0.40540,"total":0.19441,"index":114.43},
+  {"id":"fuxin-tieling","a":"阜新","b":"铁岭","hard":-0.18509,"soft":-0.86934,"total":-0.39037,"index":76.29}
+]
